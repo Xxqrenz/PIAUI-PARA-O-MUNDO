@@ -3,7 +3,7 @@ import random
 import time
 import json
 
-BROKER = "localhost"
+BROKER = "broker.hivemq.com"
 TOPICO = "colmeia/dados"
 
 while True:

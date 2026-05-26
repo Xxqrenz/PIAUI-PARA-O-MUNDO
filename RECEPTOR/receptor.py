@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import requests
 import json
 
-BROKER = "localhost"
+BROKER = "broker.hivemq.com"
 
 TOPICO = "colmeia/dados"
 
