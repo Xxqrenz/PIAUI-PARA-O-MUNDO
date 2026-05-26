@@ -57,11 +57,6 @@ def analisar_colmeia(
     return alerta
 
 
-@app.route("/")
-def home():
-
-    return "SERVIDOR FUNCIONANDO"
-
 @app.route("/dados", methods=["POST"])
 def dados():
 
@@ -71,34 +66,43 @@ def dados():
 
     som = conteudo["som"]
 
+    alerta = analisar_colmeia(
+            temperatura,
+            som
+        )
+
     data = datetime.now().strftime(
             "%d/%m/%Y %H:%M:%S"
         )
 
     cursor.execute("""
 
-INSERT INTO leituras
-(
-    temperatura,
-    som,
-    alerta,
-    data
-)
+    INSERT INTO leituras
+    (
+        temperatura,
+        som,
+        alerta,
+        data
+    )
 
-VALUES (?, ?, ?, ?)
+    VALUES (?, ?, ?, ?)
 
-""", (
-    temperatura,
-    som,
-    alerta,
-    data
-))
+    """, (
+        temperatura,
+        som,
+        alerta,
+        data
+    ))
+
     conn.commit()
 
     print("\nDADOS SALVOS:")
 
     print(conteudo)
-    
+
+    print("\nALERTA:")
+
+    print(alerta)
 
     return "OK", 200
 
