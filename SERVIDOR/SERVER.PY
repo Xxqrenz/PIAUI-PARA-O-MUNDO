@@ -23,13 +23,39 @@ CREATE TABLE IF NOT EXISTS leituras (
 
     som INTEGER,
 
+    alerta TEXT,
+
     data TEXT
 
 )
 
 """)
-
 conn.commit()
+def analisar_colmeia(
+    temperatura,
+    som
+):
+
+    alerta = "NORMAL"
+
+    if temperatura > 35:
+
+        alerta = "SUPERAQUECIMENTO"
+
+    elif som > 2500:
+
+        alerta = "ESTRESSE SONORO"
+
+    elif (
+        temperatura > 33
+        and
+        som > 2200
+    ):
+
+        alerta = "POSSIVEL ENXAMEACAO"
+
+    return alerta
+
 
 @app.route("/")
 def home():
@@ -51,24 +77,32 @@ def dados():
 
     cursor.execute("""
 
-    INSERT INTO leituras
-    (temperatura, som, data)
+INSERT INTO leituras
+(
+    temperatura,
+    som,
+    alerta,
+    data
+)
 
-    VALUES (?, ?, ?)
+VALUES (?, ?, ?, ?)
 
-    """, (
-        temperatura,
-        som,
-        data
-    ))
-
+""", (
+    temperatura,
+    som,
+    alerta,
+    data
+))
     conn.commit()
 
     print("\nDADOS SALVOS:")
 
     print(conteudo)
+    
 
     return "OK", 200
+
+
 
 app.run(
     host="0.0.0.0",
