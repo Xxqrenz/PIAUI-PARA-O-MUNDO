@@ -1,0 +1,32 @@
+import paho.mqtt.publish as publish
+import random
+import time
+import json
+
+BROKER = "localhost"
+TOPICO = "colmeia/dados"
+
+while True:
+
+    temperatura = round(random.uniform(25, 35), 1)
+
+    som = random.randint(1000, 3000)
+
+    dados = {
+        "temperatura": temperatura,
+        "som": som
+    }
+
+    mensagem = json.dumps(dados)
+
+    publish.single(
+        TOPICO,
+        mensagem,
+        hostname=BROKER
+    )
+
+    print("\n[TRANSMISSOR]")
+
+    print(mensagem)
+
+    time.sleep(5)
