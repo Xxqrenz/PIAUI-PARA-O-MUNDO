@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS leituras (
 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+    colmeia INTEGER,
+
     temperatura REAL,
 
     som INTEGER,
@@ -74,20 +76,21 @@ def dados():
     data = datetime.now().strftime(
             "%d/%m/%Y %H:%M:%S"
         )
+    colmeia = conteudo["colmeia"]
 
     cursor.execute("""
 
     INSERT INTO leituras
-    (
-        temperatura,
-        som,
-        alerta,
-        data
-    )
-
-    VALUES (?, ?, ?, ?)
+(
+    colmeia,
+    temperatura,
+    som,
+    alerta,
+    data
+)
 
     """, (
+         colmeia,
         temperatura,
         som,
         alerta,

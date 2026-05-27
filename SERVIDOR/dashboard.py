@@ -5,14 +5,24 @@ import time
 
 st.set_page_config(
     page_title="Vigia da Colmeia",
+    page_icon="🐝",
     layout="wide"
 )
 
 st.title("🐝 Vigia da Colmeia")
 
+st.markdown(
+    "Monitoramento inteligente de colmeias em tempo real"
+)
+
+
+
 placeholder = st.empty()
 
+
+
 while True:
+
 
     conn = sqlite3.connect(
         "colmeia.db"
@@ -25,7 +35,7 @@ while True:
 
     ORDER BY id DESC
 
-    LIMIT 20
+    LIMIT 100
 
     """
 
@@ -38,47 +48,152 @@ while True:
 
     if not df.empty:
 
-        ultima = df.iloc[0]
+
+
+        colmeias = sorted(
+            df["colmeia"].unique()
+        )
 
         with placeholder.container():
+            st.header("📊 Resumo Geral")
+
+            total_colmeias = len(colmeias)
+
+            alertas = len(
+                df[
+                    df["alerta"] != "NORMAL"
+                ]
+            )
+
+            media_temp = round(
+                df["temperatura"].mean(),
+                1
+            )
 
             col1, col2, col3 = st.columns(3)
 
             col1.metric(
-                "Temperatura",
-                f"{ultima['temperatura']} °C"
+                "Colmeias Ativas",
+                total_colmeias
             )
 
             col2.metric(
-                "Som",
-                f"{ultima['som']}"
+                "Temperatura Média",
+                f"{media_temp} °C"
             )
 
             col3.metric(
-                "Status",
-                ultima['alerta']
+                "Alertas Ativos",
+                alertas
             )
 
-            st.subheader(
-                "Histórico"
-            )
+            st.divider()
 
-            st.dataframe(df)
+            for colmeia in colmeias:
 
-            st.subheader(
-                "Temperatura"
-            )
+                dados_colmeia = df[
+                    df["colmeia"] == colmeia
+                ]
 
-            st.line_chart(
-                df["temperatura"]
-            )
+                ultima = dados_colmeia.iloc[0]
 
-            st.subheader(
-                "Som"
-            )
+                st.subheader(
+                    f"🐝 Colmeia {colmeia}"
+                )
 
-            st.line_chart(
-                df["som"]
+                c1, c2, c3 = st.columns(3)
+
+
+                c1.metric(
+                    "Temperatura",
+                    f"{ultima['temperatura']} °C"
+                )
+
+                c2.metric(
+                    "Som",
+                    f"{ultima['som']}"
+                )
+
+                alerta = ultima["alerta"]
+
+                c3.metric(
+                    "Status",
+                    alerta
+                )
+
+                if alerta == "NORMAL":
+
+                    st.success(
+                        "✅ Colmeia operando normalmente"
+                    )
+
+                elif alerta == "SUPERAQUECIMENTO":
+
+                    st.error(
+                        "🔥 Temperatura crítica detectada"
+                    )
+
+                elif alerta == "ESTRESSE SONORO":
+
+                    st.warning(
+                        "🔊 Atividade sonora anormal"
+                    )
+
+                elif alerta == "POSSIVEL ENXAMEACAO":
+
+                    st.error(
+                        "⚠️ Possível enxameação detectada"
+                    )
+
+                g1, g2 = st.columns(2)
+
+                with g1:
+
+                    st.markdown(
+                        "### 🌡️ Temperatura"
+                    )
+
+                    st.line_chart(
+                        dados_colmeia[
+                            "temperatura"
+                        ]
+                    )
+
+                with g2:
+
+                    st.markdown(
+                        "### 🔊 Som"
+                    )
+
+                    st.line_chart(
+                        dados_colmeia[
+                            "som"
+                        ]
+                    )
+
+                with st.expander(
+                    f"📜 Histórico Colmeia {colmeia}"
+                ):
+
+                    st.dataframe(
+                        dados_colmeia[
+                            [
+                                "temperatura",
+                                "som",
+                                "alerta",
+                                "data"
+                            ]
+                        ],
+                        use_container_width=True
+                    )
+
+                st.divider()
+    else:
+
+        with placeholder.container():
+
+            st.warning(
+                "⏳ Aguardando dados das colmeias..."
             )
 
     time.sleep(2)
