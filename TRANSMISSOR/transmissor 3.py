@@ -6,7 +6,7 @@ import json
 BROKER = "broker.hivemq.com"
 TOPICO = "colmeia/dados"
 
-COLMEIA_ID = 1
+COLMEIA_ID = 3
 
 while True:
 

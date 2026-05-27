@@ -64,33 +64,36 @@ def dados():
 
     conteudo = request.json
 
+    colmeia = conteudo["colmeia"]
+
     temperatura = conteudo["temperatura"]
 
     som = conteudo["som"]
 
     alerta = analisar_colmeia(
-            temperatura,
-            som
-        )
+        temperatura,
+        som
+    )
 
     data = datetime.now().strftime(
-            "%d/%m/%Y %H:%M:%S"
-        )
-    colmeia = conteudo["colmeia"]
+        "%d/%m/%Y %H:%M:%S"
+    )
 
     cursor.execute("""
 
     INSERT INTO leituras
-(
-    colmeia,
-    temperatura,
-    som,
-    alerta,
-    data
-)
+    (
+        colmeia,
+        temperatura,
+        som,
+        alerta,
+        data
+    )
+
+    VALUES (?, ?, ?, ?, ?)
 
     """, (
-         colmeia,
+        colmeia,
         temperatura,
         som,
         alerta,
