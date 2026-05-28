@@ -1,35 +1,52 @@
-import paho.mqtt.publish as publish
-import random
-import time
+import socket
+
 import json
 
-BROKER = "broker.hivemq.com"
-TOPICO = "colmeia/dados"
+import random
 
-COLMEIA_ID = 3
+import time
+
+HOST = "127.0.0.1"
+
+PORTA = 5000
 
 while True:
 
-    temperatura = round(random.uniform(25, 35), 1)
+    cliente = socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM
+    )
 
-    som = random.randint(1000, 3000)
+    cliente.connect(
+        (HOST, PORTA)
+    )
 
     dados = {
-        "colmeia": COLMEIA_ID,
-        "temperatura": temperatura,
-        "som": som
+
+        "colmeia": "3",
+
+        "temperatura": round(
+            random.uniform(28, 40),
+            1
+        ),
+
+        "som": random.randint(
+            1000,
+            4000
+        )
     }
 
     mensagem = json.dumps(dados)
 
-    publish.single(
-        TOPICO,
-        mensagem,
-        hostname=BROKER
+    cliente.send(
+        mensagem.encode()
     )
 
-    print("\n[TRANSMISSOR]")
+    print(
+        "[TRANSMISSOR]",
+        mensagem
+    )
 
-    print(mensagem)
+    cliente.close()
 
-    time.sleep(5)
+    time.sleep(30)

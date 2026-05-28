@@ -70,6 +70,7 @@ df = pd.read_sql_query(
     query,
     conn
 )
+print(df.columns)
 
 conn.close()
 
