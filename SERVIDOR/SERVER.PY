@@ -1,7 +1,7 @@
 from flask import Flask, request
 import sqlite3
 from datetime import datetime
-
+import time
 app = Flask(__name__)
 
 # CONEXÃO COM O BANCO
@@ -11,7 +11,7 @@ conn = sqlite3.connect(
 )
 
 cursor = conn.cursor()
-
+ultima_atividade = {}
 # CRIAR TABELA
 cursor.execute("""
 
@@ -58,13 +58,28 @@ def analisar_colmeia(
 
     return alerta
 
+def verificar_colmeias_offline():
 
+    offline = []
+
+    agora = time.time()
+
+    for colmeia, ultimo_envio in ultima_atividade.items():
+
+        tempo_sem_dados = agora - ultimo_envio
+
+        if tempo_sem_dados > 60:
+
+            offline.append(colmeia)
+
+    return offline
 @app.route("/dados", methods=["POST"])
 def dados():
 
     conteudo = request.json
 
     colmeia = conteudo["colmeia"]
+    ultima_atividade[colmeia] = time.time()
 
     temperatura = conteudo["temperatura"]
 

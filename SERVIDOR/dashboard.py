@@ -2,6 +2,11 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import time
+from datetime import datetime
+
+# ======================================
+# CONFIGURAÇÃO
+# ======================================
 
 st.set_page_config(
     page_title="Vigia da Colmeia",
@@ -9,191 +14,231 @@ st.set_page_config(
     layout="wide"
 )
 
+# ======================================
+# AUTO UPDATE
+# ======================================
+
+st.empty()
+
+# ======================================
+# LOGO CENTRALIZADA
+# ======================================
+
+col1, col2, col3 = st.columns([1,2,1])
+
+with col2:
+
+    st.image(
+        "logo.jpg",
+        width=350
+    )
+
+# ======================================
+# TÍTULO
+# ======================================
+
 st.title("🐝 Vigia da Colmeia")
 
-st.markdown(
+st.caption(
     "Monitoramento inteligente de colmeias em tempo real"
 )
 
+# ======================================
+# CONECTA NO SQLITE
+# ======================================
 
+conn = sqlite3.connect(
+    "colmeia.db"
+)
 
-placeholder = st.empty()
+query = """
 
+SELECT *
+FROM leituras
 
+ORDER BY id DESC
 
-while True:
+LIMIT 100
 
+"""
 
-    conn = sqlite3.connect(
-        "colmeia.db"
+df = pd.read_sql_query(
+    query,
+    conn
+)
+
+conn.close()
+
+# ======================================
+# VERIFICA SE EXISTEM DADOS
+# ======================================
+
+if df.empty:
+
+    st.warning(
+        "⏳ Aguardando dados..."
     )
 
-    query = """
+else:
 
-    SELECT *
-    FROM leituras
+    # COLMEIAS
 
-    ORDER BY id DESC
 
-    LIMIT 100
-
-    """
-
-    df = pd.read_sql_query(
-        query,
-        conn
+    colmeias = sorted(
+        df["colmeia"].unique()
     )
 
-    conn.close()
+    # OFFLINE
 
-    if not df.empty:
+offline = []
 
+ativas = []
 
+agora = datetime.now()
 
-        colmeias = sorted(
-            df["colmeia"].unique()
-        )
+for colmeia in colmeias:
+    
 
-        with placeholder.container():
-            st.header("📊 Resumo Geral")
+    dados_colmeia = df[
+        df["colmeia"] == colmeia
+    ]
+    ultima = dados_colmeia.iloc[0]
+    alerta = dados_colmeia.iloc[0]["alerta"]
 
-            total_colmeias = len(colmeias)
+    ultima_data_str = (
+        dados_colmeia.iloc[0]["data"]
+    )
 
-            alertas = len(
-                df[
-                    df["alerta"] != "NORMAL"
-                ]
-            )
+    ultima_data = datetime.strptime(
+        ultima_data_str,
+        "%d/%m/%Y %H:%M:%S"
+    )
 
-            media_temp = round(
-                df["temperatura"].mean(),
-                1
-            )
-
-            col1, col2, col3 = st.columns(3)
-
-            col1.metric(
-                "Colmeias Ativas",
-                total_colmeias
-            )
-
-            col2.metric(
-                "Temperatura Média",
-                f"{media_temp} °C"
-            )
-
-            col3.metric(
-                "Alertas Ativos",
-                alertas
-            )
-
-            st.divider()
-
-            for colmeia in colmeias:
-
-                dados_colmeia = df[
-                    df["colmeia"] == colmeia
-                ]
-
-                ultima = dados_colmeia.iloc[0]
-
-                st.subheader(
-                    f"🐝 Colmeia {colmeia}"
-                )
-
-                c1, c2, c3 = st.columns(3)
+    diferenca = (
+        agora - ultima_data
+    ).total_seconds()
 
 
-                c1.metric(
-                    "Temperatura",
-                    f"{ultima['temperatura']} °C"
-                )
+    # DEFINE STATUS
 
-                c2.metric(
-                    "Som",
-                    f"{ultima['som']}"
-                )
 
-                alerta = ultima["alerta"]
+    if diferenca > 60:
 
-                c3.metric(
-                    "Status",
-                    alerta
-                )
+        offline.append(colmeia)
 
-                if alerta == "NORMAL":
-
-                    st.success(
-                        "✅ Colmeia operando normalmente"
-                    )
-
-                elif alerta == "SUPERAQUECIMENTO":
-
-                    st.error(
-                        "🔥 Temperatura crítica detectada"
-                    )
-
-                elif alerta == "ESTRESSE SONORO":
-
-                    st.warning(
-                        "🔊 Atividade sonora anormal"
-                    )
-
-                elif alerta == "POSSIVEL ENXAMEACAO":
-
-                    st.error(
-                        "⚠️ Possível enxameação detectada"
-                    )
-
-                g1, g2 = st.columns(2)
-
-                with g1:
-
-                    st.markdown(
-                        "### 🌡️ Temperatura"
-                    )
-
-                    st.line_chart(
-                        dados_colmeia[
-                            "temperatura"
-                        ]
-                    )
-
-                with g2:
-
-                    st.markdown(
-                        "### 🔊 Som"
-                    )
-
-                    st.line_chart(
-                        dados_colmeia[
-                            "som"
-                        ]
-                    )
-
-                with st.expander(
-                    f"📜 Histórico Colmeia {colmeia}"
-                ):
-
-                    st.dataframe(
-                        dados_colmeia[
-                            [
-                                "temperatura",
-                                "som",
-                                "alerta",
-                                "data"
-                            ]
-                        ],
-                        use_container_width=True
-                    )
-
-                st.divider()
     else:
 
-        with placeholder.container():
+        ativas.append(colmeia)
 
-            st.warning(
-                "⏳ Aguardando dados das colmeias..."
+    # SISTEMA DE STATUS
+   
+    if colmeia in offline:
+
+        status = "🚨 OFFLINE"
+
+    else:
+
+        status = "🟢 ONLINE"
+
+
+    with st.container():
+
+        st.markdown("---")
+
+        c1, c2, c3, c4 = st.columns(4)
+
+        c1.metric(
+            f"🐝 Colmeia {colmeia}",
+            status
+        )
+
+        c2.metric(
+            "🌡️ Temperatura",
+            f"{ultima['temperatura']} °C"
+        )
+
+        c3.metric(
+            "🔊 Som",
+            ultima["som"]
+        )
+
+        c4.metric(
+            "⚠️ Alerta",
+            alerta
+        )
+
+        # SISTEMAS EXPANSÍVEIS       
+
+        with st.expander(
+            f"📊 Ver detalhes da Colmeia {colmeia}"
+        ):
+
+          
+            # SISTEMA DE ALERTAS
+       
+            if alerta == "SUPERAQUECIMENTO":
+
+                st.error(
+                    "🔥 Temperatura crítica"
+                )
+
+            elif alerta == "ESTRESSE SONORO":
+
+                st.warning(
+                    "🔊 Som anormal"
+                )
+
+            elif alerta == "NORMAL":
+
+                st.success(
+                    "✅ Funcionamento normal"
+                )
+
+            # SISTEMA GRÁFICO
+           
+            g1, g2 = st.columns(2)
+
+            with g1:
+
+                st.markdown(
+                    "### 🌡️ Temperatura"
+                )
+
+                st.line_chart(
+                    dados_colmeia[
+                        "temperatura"
+                    ]
+                )
+
+            with g2:
+
+                st.markdown(
+                    "### 🔊 Som"
+                )
+
+                st.line_chart(
+                    dados_colmeia[
+                        "som"
+                    ]
+                )
+
+           
+            # SISTEMA DE HISTÓRICO
+
+
+            st.markdown(
+                "### 📜 Histórico"
             )
 
-    time.sleep(2)
+            st.dataframe(
+                dados_colmeia,
+                width="stretch"
+            )
+
+
+# ATUALIZA AUTOMATICAMENTE
+
+
+time.sleep(2)
+
+st.rerun()
