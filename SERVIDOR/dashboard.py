@@ -3,10 +3,10 @@ import sqlite3
 import pandas as pd
 import time
 from datetime import datetime
+import base64
 
-# ======================================
-# CONFIGURAÇÃO
-# ======================================
+# CONFIGURAÇÃO DO VIGIA DA COLMEIA
+
 
 st.set_page_config(
     page_title="Vigia da Colmeia",
@@ -14,38 +14,42 @@ st.set_page_config(
     layout="wide"
 )
 
-# ======================================
+
 # AUTO UPDATE
-# ======================================
 
 st.empty()
 
-# ======================================
-# LOGO CENTRALIZADA
-# ======================================
 
-col1, col2, col3 = st.columns([1,2,1])
+# CENTRALIZAÇAO DA DIV kkk
+
+col1, col2, col3 = st.columns([2,1,2])
 
 with col2:
 
     st.image(
         "logo.jpg",
-        width=350
+        width=280
     )
 
-# ======================================
-# TÍTULO
-# ======================================
-
-st.title("🐝 Vigia da Colmeia")
-
-st.caption(
-    "Monitoramento inteligente de colmeias em tempo real"
+st.markdown(
+    """
+    <h1 style='text-align:center;'>
+        🐝 Vigia da Colmeia
+    </h1>
+    """,
+    unsafe_allow_html=True
 )
 
-# ======================================
+st.markdown(
+    """
+    <p style='text-align:center; font-size:18px;'>
+        Monitoramento inteligente de colmeias em tempo real
+    </p>
+    """,
+    unsafe_allow_html=True
+)
 # CONECTA NO SQLITE
-# ======================================
+
 
 conn = sqlite3.connect(
     "colmeia.db"
@@ -69,9 +73,7 @@ df = pd.read_sql_query(
 
 conn.close()
 
-# ======================================
 # VERIFICA SE EXISTEM DADOS
-# ======================================
 
 if df.empty:
 
@@ -122,7 +124,7 @@ for colmeia in colmeias:
     # DEFINE STATUS
 
 
-    if diferenca > 60:
+    if diferenca > 30:
 
         offline.append(colmeia)
 
