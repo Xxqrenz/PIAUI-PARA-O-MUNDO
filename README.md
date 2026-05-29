@@ -276,11 +276,11 @@ O projeto busca:
 ---
 
  👨‍💻 Equipe
- renan gomes 
- joao vitor
- vitor hugo
- isabely
- lorrany
+ renan gomes, 
+ joao vitor, 
+ vitor hugo, 
+ isabely, 
+ lorrany,
 
  professor orientador:
  Rai Araujo
