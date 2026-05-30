@@ -137,6 +137,8 @@ for colmeia in colmeias:
     if colmeia in offline:
 
         status = "🚨 OFFLINE"
+        
+        
 
     else:
 
@@ -148,26 +150,44 @@ for colmeia in colmeias:
         st.markdown("---")
 
         c1, c2, c3, c4 = st.columns(4)
+        
 
         c1.metric(
             f"🐝 Colmeia {colmeia}",
             status
         )
+        if (colmeia in offline):
+            
+            c2.metric(
+                "🌡️ Temperatura",
+                "N/A"
+            )
 
-        c2.metric(
-            "🌡️ Temperatura",
-            f"{ultima['temperatura']} °C"
-        )
+            c3.metric(
+                "🔊 Som",
+                "N/A"
+            )
 
-        c3.metric(
-            "🔊 Som",
-            ultima["som"]
-        )
+            c4.metric(
+                "⚠️ Alerta",
+                "SEM DADOS"
+            )
+        else:
 
-        c4.metric(
-            "⚠️ Alerta",
-            alerta
-        )
+            c2.metric(
+                "🌡️ Temperatura",
+                f"{ultima['temperatura']} °C"
+            )
+
+            c3.metric(
+                "🔊 Som",
+                ultima["som"]
+            )
+
+            c4.metric(
+                "⚠️ Alerta",
+                alerta
+            )
 
         # SISTEMAS EXPANSÍVEIS       
 
