@@ -84,7 +84,6 @@ if df.empty:
 
 else:
 
-    # COLMEIAS
 
 
     colmeias = sorted(
@@ -125,7 +124,7 @@ for colmeia in colmeias:
     # DEFINE STATUS
 
 
-    if diferenca > 30:
+    if diferenca > 35:
 
         offline.append(colmeia)
 
