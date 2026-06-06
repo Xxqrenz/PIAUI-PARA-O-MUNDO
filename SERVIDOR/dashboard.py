@@ -4,8 +4,6 @@ import pandas as pd
 import time
 from datetime import datetime
 import base64
-import os
-
 
 # CONFIGURAÇÃO DO VIGIA DA COLMEIA
 
@@ -24,65 +22,32 @@ st.empty()
 
 # CENTRALIZAÇAO DA DIV kkk
 
+col1, col2, col3 = st.columns([2,1,2])
 
+with col2:
 
-# ======================================
-# LOGO + TÍTULO CENTRALIZADOS
-# ======================================
-
-CAMINHO_LOGO = os.path.join(
-    os.path.dirname(__file__),
-    "logo.png"
-)
-
-with open(CAMINHO_LOGO, "rb") as imagem:
-
-    logo_base64 = base64.b64encode(
-        imagem.read()
-    ).decode()
+    st.image(
+        "logo.jpg",
+        width=280
+    )
 
 st.markdown(
-    f"""
-    <div style="
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        margin-top:-20px;
-        margin-bottom:20px;
-    ">
-
-        <img 
-            src="data:image/png;base64,{logo_base64}"
-            width="220"
-        >
-
-        <h1 style="
-            color:#111111;
-            font-size:42px;
-            margin-top:10px;
-            margin-bottom:0px;
-            text-align:center;
-        ">
-            🐝 Vigia da Colmeia
-        </h1>
-
-        <p style="
-            color:#444444;
-            font-size:18px;
-            text-align:center;
-            margin-top:5px;
-        ">
-            Monitoramento inteligente de colmeias em tempo real
-        </p>
-
-    </div>
+    """
+    <h1 style='text-align:center;'>
+        🐝 Vigia da Colmeia
+    </h1>
     """,
     unsafe_allow_html=True
 )
 
-
-
+st.markdown(
+    """
+    <p style='text-align:center; font-size:18px;'>
+        Monitoramento inteligente de colmeias em tempo real
+    </p>
+    """,
+    unsafe_allow_html=True
+)
 # CONECTA NO SQLITE
 
 
