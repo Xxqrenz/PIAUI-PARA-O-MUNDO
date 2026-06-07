@@ -22,14 +22,19 @@ st.empty()
 
 # CENTRALIZAÇAO DA DIV kkk
 
-col1, col2, col3 = st.columns([2,1,2])
+st.markdown(
+    """
+    <div style='text-align:center;'>
+        <img src='data:image/jpg;base64,{}' width='220'>
+    </div>
+    """.format(
+        base64.b64encode(
+            open("logo.jpg", "rb").read()
+        ).decode()
+    ),
+    unsafe_allow_html=True
+)
 
-with col2:
-
-    st.image(
-        "logo.jpg",
-        width=280
-    )
 
 st.markdown(
     """

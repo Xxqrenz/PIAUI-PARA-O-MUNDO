@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS leituras (
 ultimos_alertas = {}
 
 
+
 def pode_enviar(colmeia, tipo_alerta):
-    
 
     chave = f"{colmeia}_{tipo_alerta}"
 
@@ -47,7 +47,7 @@ def pode_enviar(colmeia, tipo_alerta):
 
     TEMPO_RESET = 30
 
-    # 300 segundos = 5 minutos
+    # PRIMEIRA VEZ
 
     if chave not in ultimos_alertas:
 
@@ -55,16 +55,17 @@ def pode_enviar(colmeia, tipo_alerta):
 
         return True
 
-    ultimo_envio = ultimos_alertas[chave]
+    # TEMPO PASSADO
 
-    if agora - ultimo_envio > TEMPO_RESET:
+    tempo_passado = agora - ultimos_alertas[chave]
+
+    if tempo_passado >= TEMPO_RESET:
 
         ultimos_alertas[chave] = agora
 
         return True
 
     return False
-
 
 
 
@@ -96,7 +97,7 @@ def analisar_colmeia(
     # SOM
     # ==========================
 
-    elif som > 2500:
+    if som > 2500:
 
         alerta = "ESTRESSE SONORO"
 
@@ -110,7 +111,7 @@ def analisar_colmeia(
     # ENXAMEAÇÃO
     # ==========================
 
-    elif temperatura > 33 and som > 2200:
+    if temperatura > 33 and som > 2200:
 
         alerta = "POSSIVEL ENXAMEACAO"
 
@@ -142,7 +143,7 @@ def verificar_colmeias_offline():
 
 def enviar_whatsapp(mensagem):
 
-    numero = "55899994358353"
+    numero = "558994358353"
 
     api_key = "3278509"
 
