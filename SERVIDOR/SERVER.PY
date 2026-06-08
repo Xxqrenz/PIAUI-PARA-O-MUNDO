@@ -147,9 +147,34 @@ def enviar_whatsapp(mensagem):
 
     api_key = "3278509"
 
-    url = f"https://api.callmebot.com/whatsapp.php?phone={numero}&text={mensagem}&apikey={api_key}"
+    url = (
+        "https://api.callmebot.com/whatsapp.php"
+        f"?phone={numero}"
+        f"&text={mensagem}"
+        f"&apikey={api_key}"
+    )
 
-    requests.get(url)
+    try:
+
+        resposta = requests.get(
+            url,
+            timeout=10
+        )
+
+        print("\n========================")
+        print("WHATSAPP ENVIADO")
+        print("STATUS:", resposta.status_code)
+        print("RESPOSTA:", resposta.text)
+        print("========================\n")
+
+        # Pequeno delay para evitar bloqueio
+        time.sleep(2)
+
+    except Exception as erro:
+
+        print("\nERRO WHATSAPP:")
+        print(erro)
+
 
 
 @app.route("/dados", methods=["POST"])
